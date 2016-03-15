@@ -4,10 +4,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System;
 
-public class SceneBehaviorTree {
-
-	
-}
 
 public abstract class Node
 {
@@ -20,11 +16,18 @@ public abstract class Node
 
 public abstract class Composite : Node
 {
+    string name;
     protected List<Node> children = new List<Node>();
 
-    public Composite(List<Node> childNodes)
+    public Composite(List<Node> childNodes, String name = null)
     {
         children = childNodes;
+        this.name = name;
+    }
+
+    public Composite(String name)
+    {
+        this.name = name;
     }
 
 }
@@ -36,8 +39,8 @@ public abstract class Composite : Node
 public class Selector : Composite
 {
 
-    public Selector(List<Node> childNodes) : base(childNodes) { }
-
+    public Selector(List<Node> childNodes, String name) : base(childNodes, name) { }
+    public Selector(String name) : base(name) { }
 
     public bool execute(State state)
     {
@@ -57,7 +60,9 @@ public class Selector : Composite
 
 public class Sequence : Composite
 {
-    public Sequence (List<Node> childNodes) : base(childNodes) { }
+    public Sequence (List<Node> childNodes, String name) : base(childNodes, name) { }
+    public Sequence(String name) : base(name) { }
+
     public bool execute(State state)
     {
         foreach (Node child in children)

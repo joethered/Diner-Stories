@@ -14,7 +14,7 @@ public class CheckMethods {
     }
 	public bool inSpeedDateScene(State state)
     {
-        if (state.currentScene == SceneTitles.SpeedDate)
+        if (state.currentScene == Scene.SpeedDating)
         {
             return true;
         }
@@ -22,7 +22,7 @@ public class CheckMethods {
     }
     public bool inRobberyScene(State state)
     {
-        if (state.currentScene == SceneTitles.Robbery)
+        if (state.currentScene == Scene.Robbery)
         {
             return true;
         }
@@ -30,7 +30,7 @@ public class CheckMethods {
     }
     public bool inFuneralScene(State state)
     {
-        if (state.currentScene == SceneTitles.Funeral)
+        if (state.currentScene == Scene.Funeral)
         {
             return true;
         }
@@ -40,9 +40,9 @@ public class CheckMethods {
     //Prev Scene Checks
     public bool hadSpeedDate(State state)
     {
-        foreach (SceneTitles scene in state.previousScenes)
+        foreach (Scene scene in state.previousScenes)
         {
-            if (scene == SceneTitles.SpeedDate)
+            if (scene == Scene.SpeedDating)
             {
                 return true;
             }
@@ -51,9 +51,9 @@ public class CheckMethods {
     }
     public bool hadRobbery(State state)
     {
-        foreach (SceneTitles scene in state.previousScenes)
+        foreach (Scene scene in state.previousScenes)
         {
-            if (scene == SceneTitles.Robbery)
+            if (scene == Scene.Robbery)
             {
                 return true;
             }
@@ -62,9 +62,9 @@ public class CheckMethods {
     }
     public bool hadFuneral(State state)
     {
-        foreach (SceneTitles scene in state.previousScenes)
+        foreach (Scene scene in state.previousScenes)
         {
-            if (scene == SceneTitles.Funeral)
+            if (scene == Scene.Funeral)
             {
                 return true;
             }
