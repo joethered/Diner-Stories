@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine.SceneManagement;
 
 
 
@@ -112,8 +113,8 @@ public class GameController : MonoBehaviour {
                 executeRobberyBeat();
                 
                 break;
-            case Scene.Funeral:
-
+			case Scene.Funeral:
+				executeFuneralBeat ();
                 break;
         }
         
@@ -174,8 +175,9 @@ public class GameController : MonoBehaviour {
                 state.beatIndex++;
                 break;
 
-            case 6:
-                state.currentScene = Scene.Robbery;
+			case 6:
+				//SceneManager.LoadScene ("Acts");
+				state.currentScene = Scene.Robbery;
                 state.actNumber++;
                 state.beatIndex = 0;
                 break;
@@ -274,8 +276,9 @@ public class GameController : MonoBehaviour {
                     state.beatIndex++;
                     break;
 
-                case 6:
-                    state.currentScene = Scene.SpeedDating;
+				case 6:
+					//SceneManager.LoadScene ("Acts");
+					state.currentScene = Scene.Funeral;
                     state.actNumber++;
                     state.beatIndex = 0;
                     break;
@@ -380,6 +383,326 @@ public class GameController : MonoBehaviour {
 
 
     }
+
+	public void executeFuneralBeat(){
+		if (state.beatIndex == 0)
+		{
+			//Setup Funeral
+			funeralSetup();
+			state.beatIndex++;
+			return;
+		}
+		if (playerCharacter.personalRoles.Contains(RoleType.Widowed))
+		{
+			//Widowed Beats
+			switch (state.beatIndex)
+			{
+
+			case 1:
+				//Do Peace
+				nextMove = "funeralGatheringMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+			case 2:
+				nextMove = "funeralEulogyMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+			case 3:
+				//Do Visitations
+				/*nextMove = "funeralVisitaionMove";
+
+				doMove ();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response) {
+					state.beatIndex++;
+					nextMove = "";
+					if (previousMove.value == ActionType.formal) {
+						Debug.Log ("You show your last sentiments to the deceased.");
+					} else if (previousMove.value == ActionType.awkward) {
+						Debug.Log ("You can hardly look at the deceased paying your respects, but scared to see them one more time.");
+					} else {
+						Debug.Log ("You make a sincere glance at the deceased, and leave without another word.");
+					}
+					previousMove = null;
+					recentSpeaker = null;
+
+				}*/
+				nextMove = "funeralVisitationMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+			case 4:
+				//Do Consolation
+
+				nextMove = "funeralConsolationMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+
+			case 5:
+				// TODO Dating Conclusion
+				nextMove = "funeralReceptionMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+			case 6:
+				// TODO Outcome
+				funeralConclusion();
+				waitingForPlayer = true;
+				state.beatIndex++;
+				break;
+
+			case 7:
+				//SceneManager.LoadScene ("Acts");
+				state.currentScene = Scene.SpeedDating;
+				state.actNumber++;
+				state.beatIndex = 0;
+				break;
+
+
+			}
+		}
+		else if (playerCharacter.personalRoles.Contains(RoleType.Eulogists))
+		{
+			//Eulogist Beats
+			switch (state.beatIndex)
+			{
+			case 1:
+				//Do Introductions
+				nextMove = "funeralGatheringMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+				}
+
+				break;
+
+			case 2:
+				nextMove = "funeralEulogyMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+			case 3:
+				nextMove = "funeralVisitationMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+			case 4:
+				nextMove = "funeralConsolationMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+
+			case 5:
+				// TODO Dating Conclusion
+				nextMove = "funeralReceptionMove";
+				otherCharacter = roles[RoleType.Bereaved][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+			case 6:
+				// TODO Dating Conclusion
+				funeralConclusion();
+				waitingForPlayer = true;
+				state.beatIndex++;
+				break;
+
+			case 7:
+				//SceneManager.LoadScene ("Acts");
+				state.currentScene = Scene.SpeedDating;
+				state.actNumber++;
+				state.beatIndex = 0;
+				break;
+
+			}
+		}
+		else
+		{
+			//Bereaved Beats
+			switch (state.beatIndex)
+			{
+			case 1:
+				//Order Food
+				nextMove = "funeralGatheringMove";
+				otherCharacter = roles[RoleType.Eulogists][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+				}
+
+				break;
+
+			case 2:
+				nextMove = "funeralEulogistMove";
+
+				doMove ();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response) {
+					state.beatIndex++;
+					nextMove = "";
+					if (previousMove.value == ActionType.awkward) {
+						Debug.Log ("You give out a loud sneeze breaking the pace of the ceremony and the attention.");
+					} else {
+						Debug.Log ("You give a sincere clap for the eulogist.");
+					}
+					previousMove = null;
+					recentSpeaker = null;
+
+				}
+				break;
+
+			case 3:
+				nextMove = "funeralVisitationMove";
+				otherCharacter = roles[RoleType.Eulogists][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+			case 4:
+				nextMove = "funeralConsolationMove";
+				otherCharacter = roles[RoleType.Eulogists][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+
+			case 5:
+				// TODO Dating Conclusion
+				nextMove = "funeralReceptionMove";
+				otherCharacter = roles[RoleType.Eulogists][0];
+				doMove();
+
+				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				{
+					state.beatIndex++;
+					nextMove = "";
+					previousMove = null;
+					recentSpeaker = null;
+				}
+				break;
+
+			case 6:
+				// TODO Dating Conclusion
+				funeralConclusion();
+				waitingForPlayer = true;
+				state.beatIndex++;
+				break;
+
+			case 7:
+				//SceneManager.LoadScene ("Acts");
+				state.currentScene = Scene.SpeedDating;
+				state.actNumber++;
+				state.beatIndex = 0;
+				break;
+			
+			}
+		}
+	}
 
     public void doMove()
     {
@@ -715,6 +1038,37 @@ public class GameController : MonoBehaviour {
 
         Debug.Log("You leave the diner with haste.");
     }
+
+	public void funeralSetup(){
+		
+		Debug.Log("The Funeral");
+		roles[RoleType.Widowed].Add(addNewCharacter(roles[RoleType.All]));
+		playerCharacter = roles[RoleType.Widowed][0];
+		playerCharacter.personalRoles.Add(RoleType.Widowed);
+		playerCharacter.isPlayer = true;
+
+		roles[RoleType.Eulogists].Add(addNewCharacter(roles[RoleType.All]));
+
+		roles[RoleType.Bereaved].Add(addNewCharacter(roles[RoleType.All]));
+		otherCharacter = roles[RoleType.Bereaved][0];
+		roles[RoleType.Bereaved][0].personalRoles.Add(RoleType.Bereaved);
+
+
+		transactionHistory = new BranchHistory(3);
+
+		previousMove = null;
+		nextMove = "funeralGatheringMove";
+
+		waitingForPlayer = true;
+
+		Debug.Log("You, " + playerCharacter.name + ", are arriving at the funeral.");
+		Debug.Log(roles[RoleType.Eulogists][0].name + " seems to be both anxious and sad.");
+		Debug.Log(roles[RoleType.Bereaved][0].name + " is waiting for the ceremony.");
+	}
+
+	public void funeralConclusion(){
+
+	}
 
     static T GetRandomEnum<T>()
     {

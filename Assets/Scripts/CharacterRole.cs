@@ -1034,27 +1034,452 @@ public class CharacterRole
     //Funeral Moves
     public void funeralGatheringMove(ActorMove previousMove, ActorMove currentMove = null)
     {
+		move = new ActorMove();
+		if (isPlayer)
+		{
+			if (currentMove != null)
+			{
+				move = currentMove;
+			}
+			else
+			{
+				move.value = chooseInCharacterDecision();
+			}
 
+		}
+		else
+		{
+			move.value = chooseInCharacterDecision();
+		}
+
+		if (previousMove == null)
+		{
+			move.phase = SpeechPhase.Call;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "You make a pun as you meet with the other attendees.";
+				else
+					move.output = name + " made a pun as they meet with the other attendees.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You greet the other attendees with the most sincerity.";
+				else
+					move.output = name + " greeted the other attendees with the most sincerity.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "You make an introduction, but end up stumbling as you approach the attendees.";
+				else
+					move.output = name + " makes an introduction, but ends up stumbling as they approach the attendees.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
+		else
+		{
+			move.phase = SpeechPhase.Response;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "You stand quietly as the pun falls flat.";
+				else
+					move.output = name + " stands quietly as the pun falls flat.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You greet them with the same kindness.";
+				else
+					move.output = name + " greets you with the same kindness.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "People turn in your direction as the place falls silent.";
+				else
+					move.output = "People turn in " + name + "'s direction as the place falls silent.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
     }
 
     public void funeralEulogyMove(ActorMove previousMove, ActorMove currentMove = null)
     {
+		move = new ActorMove();
+		if (isPlayer)
+		{
+			if (currentMove != null)
+			{
+				move = currentMove;
+			}
+			else
+			{
+				move.value = chooseInCharacterDecision();
+			}
 
+		}
+		else
+		{
+			move.value = chooseInCharacterDecision();
+		}
+
+		if (previousMove == null)
+		{
+			move.phase = SpeechPhase.Call;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "You give out an endearing eulogy, but try to bring up everyone's spirits.";
+				else
+					move.output = name + " gives out an endearing eulogy, but tries to bring up everyone's spirits.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You sympathize with everyone, treasuring the memory of the deceased.";
+				else
+					move.output = name + " sympathizes with everyone, treasuring the memory of the deceased.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "You pull out the eulogy from your pocket and read it out while stumbling your words.";
+				else
+					move.output = name + " pulls out the eulogy from their pocket and reads it out while stumbling their words.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
+		else
+		{
+			move.phase = SpeechPhase.Response;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "You make the entire room both happy and satisfied with the deceased.";
+				else
+					move.output = name + " makes the entire room both happy and satisfied with the deceased.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You successfully have the room tearing up to your eulogy.";
+				else
+					move.output = name + " successfully has the room tearing up to their eulogy.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "You seem to have made the room grow a bit impatient with your eulogy.";
+				else
+					move.output = name + " seems to have makde the room grow a bit impatient with their eulogy.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
     }
 
     public void funeralVisitationMove(ActorMove previousMove, ActorMove currentMove = null)
     {
+		move = new ActorMove();
+		if (isPlayer)
+		{
+			if (currentMove != null)
+			{
+				move = currentMove;
+			}
+			else
+			{
+				move.value = chooseInCharacterDecision();
+			}
 
+		}
+		else
+		{
+			move.value = chooseInCharacterDecision();
+		}
+
+		if (previousMove == null)
+		{
+			move.phase = SpeechPhase.Call;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "As you pass the casket, you lay a single flower into it.";
+				else
+					move.output = "As " + name + " passes the casket, " + name + " lays a single flower into it.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You simply see the deceased and pay your respects to them.";
+				else
+					move.output = name + " simply sees deceased and pays their respects to them.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "You accidentally sneeze into the casket of the deceased.";
+				else
+					move.output = name + " accidentally sneezes into the casket of the deceased.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
+		else
+		{
+			move.phase = SpeechPhase.Response;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "You see the room continue to be silent, but everyone seems to be smiling.";
+				else
+					move.output = name + " sees the room continue to be silent, but everyone seems to be smiling.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You feel calm.";
+				else
+					move.output = name + " feels calm.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "You feel everyone's eyes directed at you.";
+				else
+					move.output = name + " feels everyone's eyes directed at you.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
     }
 
     public void funeralConsolationMove(ActorMove previousMove, ActorMove currentMove = null)
     {
+		move = new ActorMove();
+		if (isPlayer)
+		{
+			if (currentMove != null)
+			{
+				move = currentMove;
+			}
+			else
+			{
+				move.value = chooseInCharacterDecision();
+			}
 
+		}
+		else
+		{
+			move.value = chooseInCharacterDecision();
+		}
+
+		if (previousMove == null)
+		{
+			move.phase = SpeechPhase.Call;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "You console with the widowed, but tell them to look forward to the future.";
+				else
+					move.output = name + " consoles with the widowed, but tells them to look forward to the future.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You respectfully talk with the widowed, telling them your respects.";
+				else
+					move.output = name + " respectfully talks with the widowed, telling them their respects.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "You give a quick reply about the deceased, but nothing else.";
+				else
+					move.output = name + " gives a quick reply about the deceased, but nothing else.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
+		else
+		{
+			move.phase = SpeechPhase.Response;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "You give out a smile, and thank them for their kind words.";
+				else
+					move.output = name + " gives out a smile, and thanks you for your kind words.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You thank them from their kindness";
+				else
+					move.output = name + " thanks you from your kindness.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "You remain silent.";
+				else
+					move.output = name + " remains silent.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
     }
 
     public void funeralReceptionMove(ActorMove previousMove, ActorMove currentMove = null)
     {
+		move = new ActorMove();
+		if (isPlayer)
+		{
+			if (currentMove != null)
+			{
+				move = currentMove;
+			}
+			else
+			{
+				move.value = chooseInCharacterDecision();
+			}
 
+		}
+		else
+		{
+			move.value = chooseInCharacterDecision();
+		}
+
+		if (previousMove == null)
+		{
+			move.phase = SpeechPhase.Call;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "You lift everyone's spirits trying to bring up the mood.";
+				else
+					move.output = name + " lifts everyone's spirits trying to bring up the mood.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You talk with the other attendees.";
+				else
+					move.output = name + " talks with th other attendees.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "You try to laugh it off, but your laughter makes things awkward.";
+				else
+					move.output = name + " tries to laugh it off, but their laughter makes things awkward.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
+		else
+		{
+			move.phase = SpeechPhase.Response;
+			switch (move.value)
+			{
+			case ActionType.witty:
+				if (isPlayer)
+					move.output = "You and everyone begin to enjoy each other's company after their witty retort.";
+				else
+					move.output = name + " and everyone begin to enjoy each other's company after your witty retort.";
+
+				wittyMoves++;
+				witty = wittyMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.formal:
+				if (isPlayer)
+					move.output = "You feel glad as everyone respects their attendance.";
+				else
+					move.output = name + " feels glad as everyone respects your attendence.";
+
+				formalMoves++;
+				formal = formalMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			case ActionType.awkward:
+				if (isPlayer)
+					move.output = "With the room, silent, you decide to remain quiet throughout the event.";
+				else
+					move.output = "With the room silent, " + " decides to remain quiet throughout the event.";
+
+				awkwardMoves++;
+				awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
+				break;
+			}
+		}
     }
 
     public ActionType chooseInCharacterDecision()
