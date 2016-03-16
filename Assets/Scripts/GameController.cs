@@ -3,12 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine.SceneManagement;
-
-
-
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour {
-    private State state = new State();
+    public State state = new State();
     //private SceneTree
 
     public bool randomizedStart = false;
@@ -16,24 +14,28 @@ public class GameController : MonoBehaviour {
     public bool debug = true;
 
     private bool waitingForPlayer = false;
+    private bool waitingToProceed = false;
 
     //Story Variables
     private bool isDinerClosed = false;
     private bool moreSecurity = false;
-    private Dictionary<RoleType, List<CharacterRole>> roles = new Dictionary<RoleType, List<CharacterRole>>();
     private bool wasRobbery = false;
-    private CharacterRole playerCharacter;
-    private CharacterRole otherCharacter;
-    private CharacterRole recentSpeaker = null;
+    public CharacterRole playerCharacter;
+    public CharacterRole otherCharacter;
+    public CharacterRole recentSpeaker = null;
     BranchHistory transactionHistory;
 
     private List<System.Type> beats = new List<System.Type>();
-    private List<PlotThread> plotThreads = new List<PlotThread>();
+    
 
     private ActorMove previousMove = null;
     private ActorMove currentMove;
     private string nextMove;
     private System.Type roleType = typeof(CharacterRole);
+
+    private ActionType? input = null;
+
+    private bool enabled = false;
 
     // Use this for initialization
     void Start() {
@@ -43,7 +45,7 @@ public class GameController : MonoBehaviour {
 
         foreach (RoleType r in roleEnums)
         {
-            roles[r] = new List<CharacterRole>();
+            state.roles[r] = new List<CharacterRole>();
         }
 
         if (randomizedStart)
@@ -62,42 +64,71 @@ public class GameController : MonoBehaviour {
 
         state.actNumber = 1;
         state.beatIndex = 0;
-        state.currentScene = Scene.Robbery;
 
         if (debug) Debug.Log("Initialization Complete");
+        
+    }
 
+    void Awake()
+    {
+        DontDestroyOnLoad(transform.gameObject);
     }
 
     // Update is called once per frame
     void Update() {
+        if (enabled)
+        {
+            if (!waitingToProceed)
+            {
+                if (waitingForPlayer)
+                {
 
-        if (waitingForPlayer)
-        {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                currentMove = new ActorMove();
-                currentMove.value = ActionType.witty;
-                doNextBeat();
+                    if (Input.GetKeyDown(KeyCode.UpArrow) || input == ActionType.witty)
+                    {
+                        input = null;
+                        currentMove = new ActorMove();
+                        currentMove.value = ActionType.witty;
+                        doNextBeat();
+                    }
+                    else if (Input.GetKeyDown(KeyCode.LeftArrow) || input == ActionType.formal)
+                    {
+                        input = null;
+                        currentMove = new ActorMove();
+                        currentMove.value = ActionType.formal;
+                        doNextBeat();
+                    }
+                    else if (Input.GetKeyDown(KeyCode.RightArrow) || input == ActionType.awkward)
+                    {
+                        input = null;
+                        currentMove = new ActorMove();
+                        currentMove.value = ActionType.awkward;
+                        doNextBeat();
+                    }
+                    //Debug.Log("he");
+                }
+                else
+                {
+                    doNextBeat();
+                    if (previousMove == null)
+                    {
+                        waitingForPlayer = true;
+                    }
+                    //Debug.Log("hi");
+                }
             }
-            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            else
             {
-                currentMove = new ActorMove();
-                currentMove.value = ActionType.formal;
-                doNextBeat();
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    waitingToProceed = false;
+                    GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = true;
+                    GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = true;
+                    GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = true;
+                }
             }
-            else if (Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                currentMove = new ActorMove();
-                currentMove.value = ActionType.awkward;
-                doNextBeat();
-            }
-            //Debug.Log("he");
+           
         }
-        else
-        {
-            doNextBeat();
-            //Debug.Log("hi");
-        }
+        
 
     }
 
@@ -128,6 +159,10 @@ public class GameController : MonoBehaviour {
                 //Setup SpeedDate
                 datingSetup();
                 state.beatIndex++;
+                waitingToProceed = true;
+                GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
                 break;
             case 1:
                 //Do Introductions
@@ -139,6 +174,10 @@ public class GameController : MonoBehaviour {
                     nextMove = "";
                     previousMove = null;
                     recentSpeaker = null;
+                    waitingToProceed = true;
+                    GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
                 }
 
 
@@ -163,6 +202,10 @@ public class GameController : MonoBehaviour {
                     nextMove = "";
                     previousMove = null;
                     recentSpeaker = null;
+                    waitingToProceed = true;
+                    GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
                 }
 
                 break;
@@ -173,13 +216,22 @@ public class GameController : MonoBehaviour {
                 datingConclusion();
                 waitingForPlayer = true;
                 state.beatIndex++;
+                waitingToProceed = true;
+                GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
                 break;
 
 			case 6:
 				//SceneManager.LoadScene ("Acts");
-				state.currentScene = Scene.Robbery;
                 state.actNumber++;
                 state.beatIndex = 0;
+                flipEnabled();
+                waitingForPlayer = false;
+                state.roles[RoleType.PreviousPlayers].Add(playerCharacter);
+                state.roles[RoleType.Player].Clear();
+                playerCharacter = null;
+                Application.LoadLevel("Acts");
                 break;
 
 
@@ -194,193 +246,176 @@ public class GameController : MonoBehaviour {
             //Setup Robbery
             robberySetup();
             state.beatIndex++;
+            waitingToProceed = true;
+            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+            if (playerCharacter.personalRoles.Contains(RoleType.Robbers))
+            {
+                waitingForPlayer = true;
+            }
+            else
+            {
+                waitingForPlayer = false;
+            }
+            
             return;
         }
-        if (playerCharacter.personalRoles.Contains(RoleType.Robbers))
+        //Robber Beats
+        switch (state.beatIndex)
         {
-            //Robber Beats
-            switch (state.beatIndex)
-            {
-                
-                case 1:
-                    //Do Peace
-                    nextMove = "robberyOrderFoodMove";
-                    otherCharacter = roles[RoleType.Servers][0];
-                    doMove();
 
-                    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-                    {
-                        state.beatIndex++;
-                        nextMove = "";
-                        previousMove = null;
-                        recentSpeaker = null;
-                    }
-                    break;
+            case 1:
+                //Do Peace
+                nextMove = "robberyOrderFoodMove";
 
-                case 2:
-                    //Do Onset
-                    nextMove = "robberyAnnounceRobberyMove";
-                    otherCharacter = roles[RoleType.Servers][0];
-                    doMove();
+                otherCharacter = state.roles[RoleType.Servers][0];
+                doMove();
 
-                    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-                    {
-                        state.beatIndex++;
-                        nextMove = "";
-                        previousMove = null;
-                        recentSpeaker = null;
-                    }
-                    break;
-                case 3:
-                    //Do Robbing
-                    nextMove = "robberyRobMove";
-                    otherCharacter = roles[RoleType.Servers][0];
-                    doMove();
-
-                    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-                    {
-                        state.beatIndex++;
-                        nextMove = "";
-                        previousMove = null;
-                        recentSpeaker = null;
-                    }
-                    break;
-                case 4:
-                    //Do Opportunity
-                    nextMove = "robberyOpportunityMove";
-
-                    doMove();
-
-                    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-                    {
-                        state.beatIndex++;
-                        nextMove = "";
-                        if (previousMove.value == ActionType.awkward)
-                        {
-                            roles[RoleType.Deceased].Add(roles[RoleType.Patron][0]);
-                            roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
-                            Debug.Log("You accidentally shot " + roles[RoleType.Patron][0].name + " .");
-                        }
-                        previousMove = null;
-                        recentSpeaker = null;
-                        
-                    }
-
-                    break;
-
-
-                case 5:
-                    // TODO Outcome
-                    robberyConclusion();
-                    waitingForPlayer = true;
+                if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+                {
                     state.beatIndex++;
-                    break;
+                    waitingToProceed = true;
+                    GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                    nextMove = "";
+                    previousMove = null;
+                    recentSpeaker = null;
+                    if (playerCharacter.personalRoles.Contains(RoleType.Robbers))
+                    {
+                        waitingForPlayer = true;
+                    }
+                    else
+                    {
+                        waitingForPlayer = false;
+                    }
+                }
+                Text Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+                Beat.text = "The Onset";
 
-				case 6:
-					//SceneManager.LoadScene ("Acts");
-					state.currentScene = Scene.Funeral;
-                    state.actNumber++;
-                    state.beatIndex = 0;
-                    break;
+
+                break;
+
+            case 2:
+                //Do Onset
+                nextMove = "robberyAnnounceRobberyMove";
+                otherCharacter = state.roles[RoleType.Servers][0];
+                doMove();
+
+                if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+                {
+                    state.beatIndex++;
+                    waitingToProceed = true;
+                    GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                    nextMove = "";
+                    previousMove = null;
+                    recentSpeaker = null;
+                    if (playerCharacter.personalRoles.Contains(RoleType.Robbers))
+                    {
+                        waitingForPlayer = true;
+                    }
+                    else
+                    {
+                        waitingForPlayer = false;
+                    }
+                }
+                Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+                Beat.text = "The Act";
+                break;
+            case 3:
+                //Do Robbing
+                nextMove = "robberyRobMove";
+                otherCharacter = state.roles[RoleType.Servers][0];
+                doMove();
+
+                if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+                {
+                    state.beatIndex++;
+                    waitingToProceed = true;
+                    GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                    nextMove = "";
+                    previousMove = null;
+                    recentSpeaker = null;
+                    if (playerCharacter.personalRoles.Contains(RoleType.Robbers))
+                    {
+                        waitingForPlayer = true;
+                    }
+                    else
+                    {
+                        waitingForPlayer = false;
+                    }
+                }
+                Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+                Beat.text = "The Opportunity";
+                break;
+            case 4:
+                //Do Opportunity
+                nextMove = "robberyOpportunityMove";
+
+                doMove();
+
+                if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+                {
+                    state.beatIndex++;
+                    waitingToProceed = true;
+                    GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                    nextMove = "";
+                    if (previousMove.value == ActionType.awkward)
+                    {
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Patron][0]);
+                        state.roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
+                        Debug.Log("You accidentally shot " + state.roles[RoleType.Patron][0].name + " .");
+                    }
+                    previousMove = null;
+                    recentSpeaker = null;
+                    if (playerCharacter.personalRoles.Contains(RoleType.Robbers))
+                    {
+                        waitingForPlayer = true;
+                    }
+                    else
+                    {
+                        waitingForPlayer = false;
+                    }
+
+                }
+                Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+                Beat.text = "The Outcome";
+                break;
 
 
-            }
+            case 5:
+                // TODO Outcome
+                robberyConclusion();
+                waitingForPlayer = true;
+                state.beatIndex++;
+                waitingToProceed = true;
+                GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                break;
+
+            case 6:
+                //SceneManager.LoadScene ("Acts");
+                state.actNumber++;
+                state.beatIndex = 0;
+                flipEnabled();
+                waitingForPlayer = false;
+                state.roles[RoleType.PreviousPlayers].Add(playerCharacter);
+                state.roles[RoleType.Player].Clear();
+                playerCharacter = null;
+                Application.LoadLevel("Acts");
+                break;
         }
-        else if (playerCharacter.personalRoles.Contains(RoleType.Servers))
-        {
-            //Server Beats
-            switch (state.beatIndex)
-            {
-                case 1:
-                    //Do Introductions
-                    doMove();
-
-                    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-                    {
-                        state.beatIndex++;
-                        nextMove = "";
-                        previousMove = null;
-                    }
-
-                    break;
-
-                case 2:
-                case 3:
-                case 4:
-                    //Dating Transactions 3x
-                    if (nextMove == "")
-                    {
-                        chooseDatingTransaction();
-                    }
-
-                    doMove();
-
-                    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-                    {
-                        state.beatIndex++;
-                        previousMove = null;
-                    }
-
-                    break;
 
 
-                case 5:
-                    // TODO Dating Conclusion
-
-
-
-                    break;
-
-            }
-        }
-        else
-        {
-            //Patron Beats
-            switch (state.beatIndex)
-            {
-                case 1:
-                    //Order Food
-                    doMove();
-
-                    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-                    {
-                        state.beatIndex++;
-                        nextMove = "";
-                        previousMove = null;
-                    }
-
-                    break;
-
-                case 2:
-                case 3:
-                case 4:
-                    //Dating Transactions 3x
-                    if (nextMove == "")
-                    {
-                        chooseDatingTransaction();
-                    }
-
-                    doMove();
-
-                    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-                    {
-                        state.beatIndex++;
-                        previousMove = null;
-                    }
-
-                    break;
-
-
-                case 5:
-                    // TODO Dating Conclusion
-
-
-
-                    break;
-
-            }
-        }
-
+ 
 
     }
 
@@ -390,7 +425,11 @@ public class GameController : MonoBehaviour {
 			//Setup Funeral
 			funeralSetup();
 			state.beatIndex++;
-			return;
+            waitingToProceed = true;
+            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+            return;
 		}
 		if (playerCharacter.personalRoles.Contains(RoleType.Widowed))
 		{
@@ -398,113 +437,142 @@ public class GameController : MonoBehaviour {
 			switch (state.beatIndex)
 			{
 
-			case 1:
-				//Do Peace
-				nextMove = "funeralGatheringMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+			    case 1:
+				    //Do Peace
+				    nextMove = "funeralGatheringMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                        GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                        nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
-			case 2:
-				nextMove = "funeralEulogyMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+			    case 2:
+				    nextMove = "funeralEulogyMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                        GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                        nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
-			case 3:
-				//Do Visitations
-				/*nextMove = "funeralVisitaionMove";
+			    case 3:
+				    //Do Visitations
+				    /*nextMove = "funeralVisitaionMove";
 
-				doMove ();
+				    doMove ();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response) {
-					state.beatIndex++;
-					nextMove = "";
-					if (previousMove.value == ActionType.formal) {
-						Debug.Log ("You show your last sentiments to the deceased.");
-					} else if (previousMove.value == ActionType.awkward) {
-						Debug.Log ("You can hardly look at the deceased paying your respects, but scared to see them one more time.");
-					} else {
-						Debug.Log ("You make a sincere glance at the deceased, and leave without another word.");
-					}
-					previousMove = null;
-					recentSpeaker = null;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response) {
+					    state.beatIndex++;
+					    nextMove = "";
+					    if (previousMove.value == ActionType.formal) {
+						    Debug.Log ("You show your last sentiments to the deceased.");
+					    } else if (previousMove.value == ActionType.awkward) {
+						    Debug.Log ("You can hardly look at the deceased paying your respects, but scared to see them one more time.");
+					    } else {
+						    Debug.Log ("You make a sincere glance at the deceased, and leave without another word.");
+					    }
+					    previousMove = null;
+					    recentSpeaker = null;
 
-				}*/
-				nextMove = "funeralVisitationMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+				    }*/
+				    nextMove = "funeralVisitationMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                        GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                        nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
-			case 4:
-				//Do Consolation
+			    case 4:
+				    //Do Consolation
 
-				nextMove = "funeralConsolationMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+				    nextMove = "funeralConsolationMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                        GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                        nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
 
-			case 5:
-				// TODO Dating Conclusion
-				nextMove = "funeralReceptionMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+			    case 5:
+				    // TODO Dating Conclusion
+				    nextMove = "funeralReceptionMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                        GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                        nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
-			case 6:
-				// TODO Outcome
-				funeralConclusion();
-				waitingForPlayer = true;
-				state.beatIndex++;
-				break;
+			    case 6:
+				    // TODO Outcome
+				    funeralConclusion();
+				    waitingForPlayer = true;
+				    state.beatIndex++;
+                    waitingToProceed = true;
+                    GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                    GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                    break;
 
-			case 7:
-				//SceneManager.LoadScene ("Acts");
-				state.currentScene = Scene.SpeedDating;
-				state.actNumber++;
-				state.beatIndex = 0;
-				break;
+			    case 7:
+				    //SceneManager.LoadScene ("Acts");
+				    state.actNumber++;
+				    state.beatIndex = 0;
+                    flipEnabled();
+                    waitingForPlayer = false;
+                    state.roles[RoleType.PreviousPlayers].Add(playerCharacter);
+                    state.roles[RoleType.Player].Clear();
+                    playerCharacter = null;
+                    Application.LoadLevel("Acts");
+				    break;
 
 
 			}
@@ -514,92 +582,121 @@ public class GameController : MonoBehaviour {
 			//Eulogist Beats
 			switch (state.beatIndex)
 			{
-			case 1:
-				//Do Introductions
-				nextMove = "funeralGatheringMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+			    case 1:
+				    //Do Introductions
+				    nextMove = "funeralGatheringMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-				}
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    previousMove = null;
+				    }
 
-				break;
+				    break;
 
-			case 2:
-				nextMove = "funeralEulogyMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+			    case 2:
+				    nextMove = "funeralEulogyMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
-			case 3:
-				nextMove = "funeralVisitationMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+			    case 3:
+				    nextMove = "funeralVisitationMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
-			case 4:
-				nextMove = "funeralConsolationMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+			    case 4:
+				    nextMove = "funeralConsolationMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
 
-			case 5:
-				// TODO Dating Conclusion
-				nextMove = "funeralReceptionMove";
-				otherCharacter = roles[RoleType.Bereaved][0];
-				doMove();
+			    case 5:
+				    // TODO Dating Conclusion
+				    nextMove = "funeralReceptionMove";
+				    otherCharacter = state.roles[RoleType.Bereaved][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
-			case 6:
-				// TODO Dating Conclusion
-				funeralConclusion();
-				waitingForPlayer = true;
-				state.beatIndex++;
-				break;
+			    case 6:
+				    // TODO Dating Conclusion
+				    funeralConclusion();
+				    waitingForPlayer = true;
+				    state.beatIndex++;
+                    waitingToProceed = true;
+                        GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                        break;
 
-			case 7:
-				//SceneManager.LoadScene ("Acts");
-				state.currentScene = Scene.SpeedDating;
-				state.actNumber++;
-				state.beatIndex = 0;
-				break;
+			    case 7:
+                    //SceneManager.LoadScene ("Acts");
+                    state.actNumber++;
+                    state.beatIndex = 0;
+                    flipEnabled();
+                    waitingForPlayer = false;
+                    state.roles[RoleType.PreviousPlayers].Add(playerCharacter);
+                    state.roles[RoleType.Player].Clear();
+                    playerCharacter = null;
+                    Application.LoadLevel("Acts");
+                    break;
 
 			}
 		}
@@ -608,97 +705,126 @@ public class GameController : MonoBehaviour {
 			//Bereaved Beats
 			switch (state.beatIndex)
 			{
-			case 1:
-				//Order Food
-				nextMove = "funeralGatheringMove";
-				otherCharacter = roles[RoleType.Eulogists][0];
-				doMove();
+			    case 1:
+				    //Order Food
+				    nextMove = "funeralGatheringMove";
+				    otherCharacter = state.roles[RoleType.Eulogists][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-				}
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    previousMove = null;
+				    }
 
-				break;
+				    break;
 
-			case 2:
-				nextMove = "funeralEulogistMove";
+			    case 2:
+				    nextMove = "funeralEulogistMove";
 
-				doMove ();
+				    doMove ();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response) {
-					state.beatIndex++;
-					nextMove = "";
-					if (previousMove.value == ActionType.awkward) {
-						Debug.Log ("You give out a loud sneeze breaking the pace of the ceremony and the attention.");
-					} else {
-						Debug.Log ("You give a sincere clap for the eulogist.");
-					}
-					previousMove = null;
-					recentSpeaker = null;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response) {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    if (previousMove.value == ActionType.awkward) {
+						    Debug.Log ("You give out a loud sneeze breaking the pace of the ceremony and the attention.");
+					    } else {
+						    Debug.Log ("You give a sincere clap for the eulogist.");
+					    }
+					    previousMove = null;
+					    recentSpeaker = null;
 
-				}
-				break;
+				    }
+				    break;
 
-			case 3:
-				nextMove = "funeralVisitationMove";
-				otherCharacter = roles[RoleType.Eulogists][0];
-				doMove();
+			    case 3:
+				    nextMove = "funeralVisitationMove";
+				    otherCharacter = state.roles[RoleType.Eulogists][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
-			case 4:
-				nextMove = "funeralConsolationMove";
-				otherCharacter = roles[RoleType.Eulogists][0];
-				doMove();
+			    case 4:
+				    nextMove = "funeralConsolationMove";
+				    otherCharacter = state.roles[RoleType.Eulogists][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
 
-			case 5:
-				// TODO Dating Conclusion
-				nextMove = "funeralReceptionMove";
-				otherCharacter = roles[RoleType.Eulogists][0];
-				doMove();
+			    case 5:
+				    // TODO Dating Conclusion
+				    nextMove = "funeralReceptionMove";
+				    otherCharacter = state.roles[RoleType.Eulogists][0];
+				    doMove();
 
-				if (previousMove != null && previousMove.phase == SpeechPhase.Response)
-				{
-					state.beatIndex++;
-					nextMove = "";
-					previousMove = null;
-					recentSpeaker = null;
-				}
-				break;
+				    if (previousMove != null && previousMove.phase == SpeechPhase.Response)
+				    {
+					    state.beatIndex++;
+                        waitingToProceed = true;
+                            GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                            GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                            nextMove = "";
+					    previousMove = null;
+					    recentSpeaker = null;
+				    }
+				    break;
 
-			case 6:
-				// TODO Dating Conclusion
-				funeralConclusion();
-				waitingForPlayer = true;
-				state.beatIndex++;
-				break;
+			    case 6:
+				    // TODO Dating Conclusion
+				    funeralConclusion();
+				    waitingForPlayer = true;
+				    state.beatIndex++;
+                    waitingToProceed = true;
+                        GameObject.FindGameObjectWithTag("FormalButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("WittyButton").GetComponent<Button>().interactable = false;
+                        GameObject.FindGameObjectWithTag("AwkwardButton").GetComponent<Button>().interactable = false;
+                        break;
 
-			case 7:
-				//SceneManager.LoadScene ("Acts");
-				state.currentScene = Scene.SpeedDating;
-				state.actNumber++;
-				state.beatIndex = 0;
-				break;
+			    case 7:
+                    //SceneManager.LoadScene ("Acts");
+                    state.actNumber++;
+                    state.beatIndex = 0;
+                    flipEnabled();
+                    waitingForPlayer = false;
+                    state.roles[RoleType.PreviousPlayers].Add(playerCharacter);
+                    state.roles[RoleType.Player].Clear();
+                    playerCharacter = null;
+                    Application.LoadLevel("Acts");
+                    break;
 			
 			}
 		}
@@ -738,6 +864,19 @@ public class GameController : MonoBehaviour {
 
         // OUTPUT
         Debug.Log("  " + previousMove.output);
+        if (previousMove.phase == SpeechPhase.Call)
+        {
+            Text initiator = GameObject.FindGameObjectWithTag("Initiator").GetComponent<Text>();
+            initiator.text = previousMove.output;
+            Text responder = GameObject.FindGameObjectWithTag("Responder").GetComponent<Text>();
+            responder.text = "";
+        }
+        else
+        {
+            Text responder = GameObject.FindGameObjectWithTag("Responder").GetComponent<Text>();
+            responder.text = previousMove.output;
+        }
+        
         waitingForPlayer = !waitingForPlayer;
     }
 
@@ -745,7 +884,7 @@ public class GameController : MonoBehaviour {
     public CharacterRole addNewCharacter(List<CharacterRole> currentRoles)
     {
         //Make random name and check if it already exists.  If not, add it.
-        CharacterRole newCharacter = new CharacterRole();
+        CharacterRole newCharacter = new CharacterRole(currentRoles, false);
         bool newName = true;
         string characterName;
         int loopCount = 0;
@@ -820,12 +959,20 @@ public class GameController : MonoBehaviour {
     public void datingSetup()
     {
         Debug.Log("The Speed Date");
-        roles[RoleType.Daters].Add(addNewCharacter(roles[RoleType.All]));
-        playerCharacter = roles[RoleType.Daters][0];
+        Text Title = GameObject.FindGameObjectWithTag("SceneTitle").GetComponent<Text>();
+        Title.text = "The Speed Date";
+
+        SceneInitializer initializer = new SceneInitializer();
+
+        Selector setupTree = initializer.setupSpeedDateTree();
+        setupTree.execute(state);
+
+        /*state.roles[RoleType.Daters].Add(addNewCharacter(state.roles[RoleType.All]));
+        playerCharacter = state.roles[RoleType.Daters][0];
         playerCharacter.isPlayer = true;
 
-        roles[RoleType.Daters].Add(addNewCharacter(roles[RoleType.All]));
-        otherCharacter = roles[RoleType.Daters][1];
+        state.roles[RoleType.Daters].Add(addNewCharacter(state.roles[RoleType.All]));
+        otherCharacter = state.roles[RoleType.Daters][1];*/
 
 
         transactionHistory = new BranchHistory(3);
@@ -835,7 +982,11 @@ public class GameController : MonoBehaviour {
         waitingForPlayer = canSpeakFirst(playerCharacter, otherCharacter);
 
         // OUTPUT
-        Debug.Log("  You, " + roles[RoleType.Daters][0].name + ", sit down with " + roles[RoleType.Daters][1].name + ".");
+        Debug.Log("  You, " + state.roles[RoleType.Daters][0].name + ", sit down with " + state.roles[RoleType.Daters][1].name + ".");
+        Text initiator = GameObject.FindGameObjectWithTag("Initiator").GetComponent<Text>();
+        initiator.text = "  You, " + state.roles[RoleType.Daters][0].name + ", sit down with " + state.roles[RoleType.Daters][1].name + ".";
+        Text Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+        Beat.text = "Introductions";
         Debug.Log("Introductions");
     }
 
@@ -856,16 +1007,22 @@ public class GameController : MonoBehaviour {
         if (transactionType == 1)
         {
             Debug.Log("The Compliment");
+            Text Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+            Beat.text = "The Compliment";
             nextMove = "datingComplimentMove";
         }
         else if (transactionType == 2)
         {
             Debug.Log("The Small Talk");
+            Text Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+            Beat.text = "The Small Talk";
             nextMove = "datingSmallTalkMove";
         }
         else
         {
             Debug.Log("The Joke");
+            Text Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+            Beat.text = "The Joke";
             nextMove = "datingJokeMove";
         }
 
@@ -881,41 +1038,55 @@ public class GameController : MonoBehaviour {
     {
         int oChoice = Random.Range(0, 2);
 
+        Text Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+        Beat.text = "The Choice";
+
         if (currentMove.value == ActionType.witty || currentMove.value == ActionType.formal)
         {
             Debug.Log("You want to see " + otherCharacter.name + " again.");
+            Text initiator = GameObject.FindGameObjectWithTag("Initiator").GetComponent<Text>();
+            initiator.text = "You want to see " + otherCharacter.name + " again.";
 
             if (oChoice == 1)
             {
                 Debug.Log("And " + otherCharacter.name + " wants to see you again.");
-                plotThreads.Add(PlotThread.what_will_happen_to_the_lovers);
-                roles[RoleType.Lovers].Add(playerCharacter);
+                Text responder = GameObject.FindGameObjectWithTag("Responder").GetComponent<Text>();
+                responder.text = "And " + otherCharacter.name + " wants to see you again.";
+                state.plotThreads.Add(PlotThread.what_will_happen_to_the_lovers);
+                state.roles[RoleType.Lovers].Add(playerCharacter);
                 playerCharacter.personalRoles.Add(RoleType.Lovers);
                 playerCharacter.partner = otherCharacter;
 
-                roles[RoleType.Lovers].Add(otherCharacter);
+                state.roles[RoleType.Lovers].Add(otherCharacter);
                 otherCharacter.personalRoles.Add(RoleType.Lovers);
                 otherCharacter.partner = playerCharacter;
             }
             else
             {
                 Debug.Log("But " + otherCharacter.name + " didn't want to see you.");
-                plotThreads.Add(PlotThread.what_will_happen_to_the_spurned);
-                roles[RoleType.Spurned].Add(playerCharacter);
+                Text responder = GameObject.FindGameObjectWithTag("Responder").GetComponent<Text>();
+                responder.text = "But " + otherCharacter.name + " didn't want to see you.";
+                state.plotThreads.Add(PlotThread.what_will_happen_to_the_spurned);
+                state.roles[RoleType.Spurned].Add(playerCharacter);
             }
         }
         else
         {
             Debug.Log("You didn't want to see " + otherCharacter.name + " again.");
+            Text initiator = GameObject.FindGameObjectWithTag("Initiator").GetComponent<Text>();
+            initiator.text = "You didn't want to see " + otherCharacter.name + " again.";
+            Text responder = GameObject.FindGameObjectWithTag("Responder").GetComponent<Text>();
+            responder.text = "";
+
 
             if (oChoice == 1)
             {
-                plotThreads.Add(PlotThread.what_will_happen_to_the_spurned);
-                roles[RoleType.Spurned].Add(otherCharacter);
+                state.plotThreads.Add(PlotThread.what_will_happen_to_the_spurned);
+                state.roles[RoleType.Spurned].Add(otherCharacter);
             }
             else
             {
-                plotThreads.Add(PlotThread.what_was_the_signifigance_of_the_small_talk);
+                state.plotThreads.Add(PlotThread.what_was_the_signifigance_of_the_small_talk);
             }
         }
 
@@ -925,103 +1096,117 @@ public class GameController : MonoBehaviour {
     public void robberySetup()
     {
         Debug.Log("The Robbery");
-        roles[RoleType.Robbers].Add(addNewCharacter(roles[RoleType.All]));
-        playerCharacter = roles[RoleType.Robbers][0];
+        Text Title = GameObject.FindGameObjectWithTag("SceneTitle").GetComponent<Text>();
+        Title.text = "The Robbery";
+
+        SceneInitializer initializer = new SceneInitializer();
+
+        Selector setupTree = initializer.setupRobberyTree();
+        setupTree.execute(state);
+
+        /*state.roles[RoleType.Robbers].Add(addNewCharacter(state.roles[RoleType.All]));
+        playerCharacter = state.roles[RoleType.Robbers][0];
         playerCharacter.personalRoles.Add(RoleType.Robbers);
         playerCharacter.isPlayer = true;
 
-        roles[RoleType.Patron].Add(addNewCharacter(roles[RoleType.All]));
+        state.roles[RoleType.Patron].Add(addNewCharacter(state.roles[RoleType.All]));
 
-        roles[RoleType.Servers].Add(addNewCharacter(roles[RoleType.All]));
-        otherCharacter = roles[RoleType.Servers][0];
-        roles[RoleType.Servers][0].personalRoles.Add(RoleType.Servers);
+        state.roles[RoleType.Servers].Add(addNewCharacter(state.roles[RoleType.All]));
+        otherCharacter = state.roles[RoleType.Servers][0];
+        state.roles[RoleType.Servers][0].personalRoles.Add(RoleType.Servers);
+        */
 
-
-        transactionHistory = new BranchHistory(3);
 
         previousMove = null;
         nextMove = "robberyOrderFoodMove";
 
         waitingForPlayer = true;
+        Text Beat = GameObject.FindGameObjectWithTag("Beat").GetComponent<Text>();
+        Beat.text = "The Ordinary Day";
 
         Debug.Log("You, " + playerCharacter.name + ", are sitting in the diner.");
-        Debug.Log(roles[RoleType.Patron][0].name + " is also sitting in the diner elsewhere.");
-        Debug.Log(roles[RoleType.Servers][0].name + " is working.");
+        Debug.Log(state.roles[RoleType.Patron][0].name + " is also sitting in the diner elsewhere.");
+        Debug.Log(state.roles[RoleType.Servers][0].name + " is working.");
+
+        Text initiator = GameObject.FindGameObjectWithTag("Initiator").GetComponent<Text>();
+        initiator.text = "You, " + playerCharacter.name + ", are sitting in the diner.  " + state.roles[RoleType.Patron][0].name + " is also sitting in the diner elsewhere.  " +
+                            state.roles[RoleType.Servers][0].name + " is working.";
+
     }
 
     public void robberyConclusion()
     {
-        if (state.actNumber == 2 && roles[RoleType.Deceased].Count == 0)
+        if (state.actNumber == 2 && state.roles[RoleType.Deceased].Count == 0)
         {
-            switch (roles[RoleType.Robbers][0].chooseInCharacterDecision())
+            switch (state.roles[RoleType.Robbers][0].chooseInCharacterDecision())
             {
                 case ActionType.witty:
-                    if (roles[RoleType.Patron][0].personalRoles.Contains(RoleType.Lovers))
+                    if (state.roles[RoleType.Patron][0].personalRoles.Contains(RoleType.Lovers))
                     {
-                        roles[RoleType.Deceased].Add(roles[RoleType.Patron][0]);
-                        roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
-                        roles[RoleType.Patron][0].partner.personalRoles.Add(RoleType.Widowed);
-                        Debug.Log("On a whim you decide to shoot " + roles[RoleType.Patron][0].name + " .");
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Patron][0]);
+                        state.roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
+                        state.roles[RoleType.Patron][0].partner.personalRoles.Add(RoleType.Widowed);
+                        Debug.Log("On a whim you decide to shoot " + state.roles[RoleType.Patron][0].name + " .");
                     }
-                    else if (roles[RoleType.Servers][0].personalRoles.Contains(RoleType.Lovers))
+                    else if (state.roles[RoleType.Servers][0].personalRoles.Contains(RoleType.Lovers))
                     {
-                        roles[RoleType.Deceased].Add(roles[RoleType.Servers][0]);
-                        roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
-                        roles[RoleType.Servers][0].partner.personalRoles.Add(RoleType.Widowed);
-                        Debug.Log("On a whim you decide to shoot " + roles[RoleType.Servers][0].name + " .");
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Servers][0]);
+                        state.roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
+                        state.roles[RoleType.Servers][0].partner.personalRoles.Add(RoleType.Widowed);
+                        Debug.Log("On a whim you decide to shoot " + state.roles[RoleType.Servers][0].name + " .");
                     }
                     else
                     {
-                        roles[RoleType.Deceased].Add(roles[RoleType.Servers][0]);
-                        roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
-                        Debug.Log("On a whim you decide to shoot " + roles[RoleType.Servers][0].name + " .");
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Servers][0]);
+                        state.roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
+                        Debug.Log("On a whim you decide to shoot " + state.roles[RoleType.Servers][0].name + " .");
                     }
 
                     break;
 
                 case ActionType.formal:
-                    if (roles[RoleType.Patron][0].personalRoles.Contains(RoleType.Lovers))
+                    if (state.roles[RoleType.Patron][0].personalRoles.Contains(RoleType.Lovers))
                     {
-                        roles[RoleType.Deceased].Add(roles[RoleType.Patron][0]);
-                        roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
-                        roles[RoleType.Patron][0].partner.personalRoles.Add(RoleType.Widowed);
-                        Debug.Log("With a stoic look, you shoot " + roles[RoleType.Patron][0].name + " .");
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Patron][0]);
+                        state.roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
+                        state.roles[RoleType.Patron][0].partner.personalRoles.Add(RoleType.Widowed);
+                        Debug.Log("With a stoic look, you shoot " + state.roles[RoleType.Patron][0].name + " .");
                     }
-                    else if (roles[RoleType.Servers][0].personalRoles.Contains(RoleType.Lovers))
+                    else if (state.roles[RoleType.Servers][0].personalRoles.Contains(RoleType.Lovers))
                     {
-                        roles[RoleType.Deceased].Add(roles[RoleType.Servers][0]);
-                        roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
-                        roles[RoleType.Servers][0].partner.personalRoles.Add(RoleType.Widowed);
-                        Debug.Log("With a stoic look, you shoot " + roles[RoleType.Servers][0].name + " .");
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Servers][0]);
+                        state.roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
+                        state.roles[RoleType.Servers][0].partner.personalRoles.Add(RoleType.Widowed);
+                        Debug.Log("With a stoic look, you shoot " + state.roles[RoleType.Servers][0].name + " .");
                     }
                     else
                     {
-                        roles[RoleType.Deceased].Add(roles[RoleType.Servers][0]);
-                        roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
-                        Debug.Log("With a stoic look, you shoot " + roles[RoleType.Servers][0].name + " .");
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Servers][0]);
+                        state.roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
+                        Debug.Log("With a stoic look, you shoot " + state.roles[RoleType.Servers][0].name + " .");
                     }
                     break;
 
                 case ActionType.awkward:
-                    if (roles[RoleType.Patron][0].personalRoles.Contains(RoleType.Lovers))
+                    if (state.roles[RoleType.Patron][0].personalRoles.Contains(RoleType.Lovers))
                     {
-                        roles[RoleType.Deceased].Add(roles[RoleType.Patron][0]);
-                        roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
-                        roles[RoleType.Patron][0].partner.personalRoles.Add(RoleType.Widowed);
-                        Debug.Log("You fumble with your gun and accidentally shoot " + roles[RoleType.Patron][0].name + " .");
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Patron][0]);
+                        state.roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
+                        state.roles[RoleType.Patron][0].partner.personalRoles.Add(RoleType.Widowed);
+                        Debug.Log("You fumble with your gun and accidentally shoot " + state.roles[RoleType.Patron][0].name + " .");
                     }
-                    else if (roles[RoleType.Servers][0].personalRoles.Contains(RoleType.Lovers))
+                    else if (state.roles[RoleType.Servers][0].personalRoles.Contains(RoleType.Lovers))
                     {
-                        roles[RoleType.Deceased].Add(roles[RoleType.Servers][0]);
-                        roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
-                        roles[RoleType.Servers][0].partner.personalRoles.Add(RoleType.Widowed);
-                        Debug.Log("You fumble with your gun and accidentally shoot " + roles[RoleType.Servers][0].name + " .");
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Servers][0]);
+                        state.roles[RoleType.Servers][0].personalRoles.Add(RoleType.Deceased);
+                        state.roles[RoleType.Servers][0].partner.personalRoles.Add(RoleType.Widowed);
+                        Debug.Log("You fumble with your gun and accidentally shoot " + state.roles[RoleType.Servers][0].name + " .");
                     }
                     else
                     {
-                        roles[RoleType.Deceased].Add(roles[RoleType.Patron][0]);
-                        roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
-                        Debug.Log("You fumble with your gun and accidentally shoot " + roles[RoleType.Patron][0].name + " .");
+                        state.roles[RoleType.Deceased].Add(state.roles[RoleType.Patron][0]);
+                        state.roles[RoleType.Patron][0].personalRoles.Add(RoleType.Deceased);
+                        Debug.Log("You fumble with your gun and accidentally shoot " + state.roles[RoleType.Patron][0].name + " .");
                     }
                     break;
 
@@ -1029,9 +1214,8 @@ public class GameController : MonoBehaviour {
 
             }
 
-            plotThreads.Add(PlotThread.who_died);
-            plotThreads.Add(PlotThread.who_is_the_robber);
-            plotThreads.Add(PlotThread.will_the_robber_get_justice);
+            state.plotThreads.Add(PlotThread.aftermath_of_death);
+            state.plotThreads.Add(PlotThread.what_happened_to_the_robber);
 
             
         }
@@ -1042,16 +1226,18 @@ public class GameController : MonoBehaviour {
 	public void funeralSetup(){
 		
 		Debug.Log("The Funeral");
-		roles[RoleType.Widowed].Add(addNewCharacter(roles[RoleType.All]));
-		playerCharacter = roles[RoleType.Widowed][0];
+        Text Title = GameObject.FindGameObjectWithTag("SceneTitle").GetComponent<Text>();
+        Title.text = "The Funeral";
+        state.roles[RoleType.Widowed].Add(addNewCharacter(state.roles[RoleType.All]));
+		playerCharacter = state.roles[RoleType.Widowed][0];
 		playerCharacter.personalRoles.Add(RoleType.Widowed);
 		playerCharacter.isPlayer = true;
 
-		roles[RoleType.Eulogists].Add(addNewCharacter(roles[RoleType.All]));
+        state.roles[RoleType.Eulogists].Add(addNewCharacter(state.roles[RoleType.All]));
 
-		roles[RoleType.Bereaved].Add(addNewCharacter(roles[RoleType.All]));
-		otherCharacter = roles[RoleType.Bereaved][0];
-		roles[RoleType.Bereaved][0].personalRoles.Add(RoleType.Bereaved);
+        state.roles[RoleType.Bereaved].Add(addNewCharacter(state.roles[RoleType.All]));
+		otherCharacter = state.roles[RoleType.Bereaved][0];
+        state.roles[RoleType.Bereaved][0].personalRoles.Add(RoleType.Bereaved);
 
 
 		transactionHistory = new BranchHistory(3);
@@ -1062,11 +1248,12 @@ public class GameController : MonoBehaviour {
 		waitingForPlayer = true;
 
 		Debug.Log("You, " + playerCharacter.name + ", are arriving at the funeral.");
-		Debug.Log(roles[RoleType.Eulogists][0].name + " seems to be both anxious and sad.");
-		Debug.Log(roles[RoleType.Bereaved][0].name + " is waiting for the ceremony.");
+		Debug.Log(state.roles[RoleType.Eulogists][0].name + " seems to be both anxious and sad.");
+		Debug.Log(state.roles[RoleType.Bereaved][0].name + " is waiting for the ceremony.");
 	}
 
-	public void funeralConclusion(){
+	public void funeralConclusion()
+    {
 
 	}
 
@@ -1077,6 +1264,27 @@ public class GameController : MonoBehaviour {
         return V;
     }
 
+    public void clickWitty()
+    {
+        input = ActionType.witty;
+    }
+    public void clickFormal()
+    {
+        input = ActionType.formal;
+    }
+    public void clickAwkward()
+    {
+        input = ActionType.awkward;
+    }
+
+    public void flipEnabled()
+    {
+        enabled = !enabled;
+        Text initiator = GameObject.FindGameObjectWithTag("Initiator").GetComponent<Text>();
+        initiator.text = "";
+        Text responder = GameObject.FindGameObjectWithTag("Responder").GetComponent<Text>();
+        responder.text = "";
+    }
 }
 
 
@@ -1158,12 +1366,13 @@ public class State
     public Scene currentScene;
 
     public List<Scene> previousScenes = new List<Scene>();
+    public List<PlotThread> plotThreads = new List<PlotThread>();
 
     public bool isDinerClosed = false;
     public bool moreSecurity = false;
     public bool wasRobbery = false;
 
-    public Dictionary<string, List<CharacterRole>> roles = new Dictionary<string, List<CharacterRole>>();
+    public Dictionary<RoleType, List<CharacterRole>> roles = new Dictionary<RoleType, List<CharacterRole>>();
     
     public CharacterRole playerCharacter;
 
@@ -1181,7 +1390,7 @@ public class State
         isDinerClosed = original.isDinerClosed;
         moreSecurity = original.moreSecurity;
         wasRobbery = original.wasRobbery;
-        roles = new Dictionary<string, List<CharacterRole>>(original.roles);
+        roles = new Dictionary<RoleType, List<CharacterRole>>(original.roles);
 
 
 

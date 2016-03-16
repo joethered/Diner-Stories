@@ -76,14 +76,11 @@ public enum PlotThread
     what_was_the_signifigance_of_the_small_talk,
 
     //Robbery Plot threads
-    who_is_the_robber,
-    what_is_the_aftermath,
-    will_the_robber_get_justice,
+    what_happened_to_the_robber,
+    aftermath_of_death,
 
     //Funeral Plot threads
-    who_died,
-    how_does_the_widowed_move_on,
-    how_was_the_widoweds_life_affected
+    what_happened_to_the_widow
 
 }
 

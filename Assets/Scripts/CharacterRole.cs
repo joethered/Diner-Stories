@@ -90,7 +90,7 @@ public class CharacterRole
             }
 
             loopCount++;
-            Debug.Log(loopCount);
+            //Debug.Log(loopCount);
         } while (!newName && loopCount < 100);
 
         if (loopCount > 100)
@@ -465,7 +465,7 @@ public class CharacterRole
                             if (isPlayer)
                                 move.output = "You don't know much about this topic.";
                             else
-                                move.output = name + "doesn't know much about this topic.";
+                                move.output = name + " doesn't know much about this topic.";
                             awkwardMoves++;
                             awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
                             break;
@@ -494,7 +494,7 @@ public class CharacterRole
                             if (isPlayer)
                                 move.output = "You don't know much about this topic.";
                             else
-                                move.output = name + "doesn't know much about this topic.";
+                                move.output = name + " doesn't know much about this topic.";
                             awkwardMoves++;
                             awkward = awkwardMoves / (wittyMoves + formalMoves + awkwardMoves);
                             break;

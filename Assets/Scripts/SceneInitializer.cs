@@ -21,13 +21,14 @@ public class SceneInitializer {
                     {
                         Check isRobberPlotThreadActive = new Check("isRobberPlotThreadActive");
                         Check isWidowedPlotThreadActive = new Check("isWidowedPlotThreadActive");
-                        //Action setEx
                         Action setPlayerAsWidow = new Action("setPlayerAsWidow");
-                        Action setDateAsRobber = new Action("setDateAsRobber");
+                        Action setPlayerAsDater1 = new Action("setPlayerAsDater1");
+                        Action setRobberAsDater2 = new Action("setRobberAsDater2");
                         robberAndWidow.children.Add(isRobberPlotThreadActive);
                         robberAndWidow.children.Add(isWidowedPlotThreadActive);
                         robberAndWidow.children.Add(setPlayerAsWidow);
-                        robberAndWidow.children.Add(setDateAsRobber);
+                        robberAndWidow.children.Add(setPlayerAsDater1);
+                        robberAndWidow.children.Add(setRobberAsDater2);
                     }
                     Sequence robberOnADate = new Sequence("The Robber Goes on a Date");
                     {
@@ -37,18 +38,22 @@ public class SceneInitializer {
                             Sequence robberWasPlayer = new Sequence("The robber was the player");
                             {
                                 Check wasRobberPlayer = new Check("wasRobberPlayer");
-                                Action setDateAsRobber = new Action("setDateAsRobber");
-                                Action setPlayerAsExisting = new Action("setPlayerAsExisting");
+                                Action setNewAsDater1 = new Action("setNewAsDater1");  // Was Existing
+                                Action setPlayerAsDater1 = new Action("setPlayerAsDater1");
+                                Action setRobberAsDater2 = new Action("setRobberAsDater2");
                                 robberWasPlayer.children.Add(wasRobberPlayer);
-                                robberWasPlayer.children.Add(setDateAsRobber);
-                                robberWasPlayer.children.Add(setPlayerAsExisting);
+                                robberWasPlayer.children.Add(setNewAsDater1);              // Was Existing
+                                robberWasPlayer.children.Add(setPlayerAsDater1);
+                                robberWasPlayer.children.Add(setRobberAsDater2);
                             }
                             Sequence robberWasNotPlayer = new Sequence("The robber was not the player");
                             {
-                                Action setPlayerAsRobber = new Action("setPlayerAsRobber");
-                                Action setDateAsExisting = new Action("setDateAsExisting");
-                                robberWasNotPlayer.children.Add(setPlayerAsRobber);
-                                robberWasNotPlayer.children.Add(setDateAsExisting);
+                                Action setRobberAsDater1 = new Action("setRobberAsDater1");
+                                Action setPlayerAsDater1 = new Action("setPlayerAsDater1");
+                                Action setNewAsDater2 = new Action("setNewAsDater2"); // Was Existing
+                                robberWasNotPlayer.children.Add(setRobberAsDater1);
+                                robberWasNotPlayer.children.Add(setPlayerAsDater1);
+                                robberWasNotPlayer.children.Add(setNewAsDater2);           // Was Existing
                             }
                             
                             whoIsTheRobber.children.Add(robberWasPlayer);
@@ -60,18 +65,22 @@ public class SceneInitializer {
                     Sequence widowOnADate = new Sequence("The Widow Goes on a Date");
                     {
                         Check wasWidowPlayer = new Check("wasWidowPlayer");
-                        Action setDateAsWidow = new Action("setDateAsWidow");
-                        Action setPlayerAsExisting = new Action("setPlayerAsExisting");
+                        Action setNewAsDater1 = new Action("setNewAsDater1");         // Was Existing
+                        Action setPlayerAsDater1 = new Action("setPlayerAsDater1");
+                        Action setWidowAsDater2 = new Action("setWidowAsDater2");
                         widowOnADate.children.Add(wasWidowPlayer);
-                        widowOnADate.children.Add(setDateAsWidow);
-                        widowOnADate.children.Add(setPlayerAsExisting);
+                        widowOnADate.children.Add(setNewAsDater1);                         // Was Existing
+                        widowOnADate.children.Add(setPlayerAsDater1);
+                        widowOnADate.children.Add(setWidowAsDater2);
                     }
                     Sequence playerWidow = new Sequence("The Player is the Widow");
                     {
-                        Action setPlayerAsWidow = new Action("setPlayerAsWidow");
-                        Action setDateAsExisting = new Action("setDateAsExisting");
-                        widowOnADate.children.Add(setPlayerAsWidow);
-                        widowOnADate.children.Add(setDateAsExisting);
+                        Action setWidowAsDater1 = new Action("setWidowAsDater1");
+                        Action setPlayerAsDater1 = new Action("setPlayerAsDater1");
+                        Action setNewAsDater2 = new Action("setNewAsDater2");         // Was Existing
+                        widowOnADate.children.Add(setWidowAsDater1);
+                        widowOnADate.children.Add(setPlayerAsDater1);
+                        widowOnADate.children.Add(setNewAsDater2);                         // Was Existing
                     }
                     conclusionPlan.children.Add(robberAndWidow);
                     conclusionPlan.children.Add(robberOnADate);
@@ -97,14 +106,16 @@ public class SceneInitializer {
                             Sequence robberWasPlayer = new Sequence("The robber was the player");
                             {
                                 Check wasRobberPlayer = new Check("wasRobberPlayer");
-                                Action robberDate = new Action("makeRobberDate");
+                                Action setRobberAsDater1 = new Action("setRobberAsDater1");
+                                Action setPlayerAsDater1 = new Action("setPlayerAsDater1");
+                                Action setNewAsDater2 = new Action("setNewAsDater2");
                                 robberWasPlayer.children.Add(wasRobberPlayer);
-                                robberWasPlayer.children.Add(robberDate);
+                                robberWasPlayer.children.Add(setRobberAsDater1);
+                                robberWasPlayer.children.Add(setPlayerAsDater1);
+                                robberWasPlayer.children.Add(setNewAsDater2);
                             }
 
-                            Action robberPlayer = new Action("makerRobberPlayer");
                             whoIsTheRobber.children.Add(robberWasPlayer);
-                            whoIsTheRobber.children.Add(robberPlayer);
                         }
                         datingWithRobber.children.Add(isRobberPlotThreadActive);
                         datingWithRobber.children.Add(whoIsTheRobber);
@@ -118,12 +129,16 @@ public class SceneInitializer {
                             Sequence widowWasPlayer = new Sequence("The widow was the player");
                             {
                                 Check wasWidowPlayer = new Check("wasWidowPlayer");
-                                Action widowDate = new Action("makeWidowDate");
+                                Action setWidowAsDater1 = new Action("setWidowAsDater1");
+                                Action setPlayerAsDater1 = new Action("setPlayerAsDater1");
+                                Action setNewAsDater2 = new Action("setNewAsDater2");
                                 widowWasPlayer.children.Add(wasWidowPlayer);
-                                widowWasPlayer.children.Add(widowDate);
+                                widowWasPlayer.children.Add(setWidowAsDater1);
+                                widowWasPlayer.children.Add(setPlayerAsDater1);
+                                widowWasPlayer.children.Add(setNewAsDater2);
                             }
-                            Action widowPlayer = new Action("widowPlayer");
-                            whoIsWidow.children.Add(widowPlayer);
+                            
+                            whoIsWidow.children.Add(widowWasPlayer);
                         }
                         
                         widowedMovesOn.children.Add(isWidowedPlotThreadActive);
@@ -163,26 +178,29 @@ public class SceneInitializer {
                             Sequence widowWasPlayer = new Sequence("The widow was the Player");
                             {
                                 Check wasWidowPlayer = new Check("wasWidowPlayer");
+                                Action setNewAsServer = new Action("setNewAsServer");     // Was Existing
                                 Action setPlayerAsServer = new Action("setPlayerAsServer");
                                 Action setWidowAsRobber = new Action("setWidowAsRobber");
-                                Action setExistingAsPatron = new Action("setExistingAsPatron");
+                                Action setNewAsPatron = new Action("setNewAsPatron");     // Was Existing
                                 widowWasPlayer.children.Add(wasWidowPlayer);
+                                widowWasPlayer.children.Add(setNewAsServer);                   // Was Existing
                                 widowWasPlayer.children.Add(setPlayerAsServer);
                                 widowWasPlayer.children.Add(setWidowAsRobber);
-                                widowWasPlayer.children.Add(setExistingAsPatron);
+                                widowWasPlayer.children.Add(setNewAsPatron);                   // Was Existing
                             }
                             Sequence widowWasNotPlayer = new Sequence("The widow was not the player");
                             {
                                 Action setWidowAsRobber = new Action("setWidowAsRobber");
                                 Action setPlayerAsRobber = new Action("setPlayerAsRobber");
-                                Action setExistingAsServer = new Action("setExistingAsServer");
-                                Action setExistingAsPatron = new Action("setExistingAsPatron");
+                                Action setNewAsServer = new Action("setNewAsServer");     // Was Existing
+                                Action setNewAsPatron = new Action("setNewAsPatron");     // Was Existing
                                 widowWasNotPlayer.children.Add(setWidowAsRobber);
                                 widowWasNotPlayer.children.Add(setPlayerAsRobber);
-                                widowWasNotPlayer.children.Add(setExistingAsServer);
-                                widowWasNotPlayer.children.Add(setExistingAsPatron);
+                                widowWasNotPlayer.children.Add(setNewAsServer);                // Was Existing
+                                widowWasNotPlayer.children.Add(setNewAsPatron);                // Was Existing
                             }
-
+                            whoIsTheWidow.children.Add(widowWasPlayer);
+                            whoIsTheWidow.children.Add(widowWasNotPlayer);
                         }
                         widdowGoneMad.children.Add(isWidowedPlotThreadActive);
                         widdowGoneMad.children.Add(whoIsTheWidow);
@@ -192,11 +210,11 @@ public class SceneInitializer {
                         Check isLoversThreadActive = new Check("isLoversThreadActive");
                         Sequence statCrossedSetup = new Sequence("Star Crossed Setup");
                         {
-                            Action setExistingAsRobber = new Action("setExistingAsRobber");
+                            Action setNewAsRobber = new Action("setNewAsRobber");         // Was Existing
                             Action setPlayerAsRobber = new Action("setPlayerAsRobber");
                             Action setLover1AsServer = new Action("setLover1AsServer");
                             Action setLover2AsPatron = new Action("setLover2AsPatron");
-                            statCrossedSetup.children.Add(setExistingAsRobber);
+                            statCrossedSetup.children.Add(setNewAsRobber);                     // Was Existing
                             statCrossedSetup.children.Add(setPlayerAsRobber);
                             statCrossedSetup.children.Add(setLover1AsServer);
                             statCrossedSetup.children.Add(setLover2AsPatron);
@@ -207,29 +225,32 @@ public class SceneInitializer {
                     Sequence spurnedDater = new Sequence("The Spurned Dater");
                     {
                         Check isSpurnedThreadActive = new Check("isSpurnedThreadActive");
-                        Action setSpurnedAsRobber = new Action("isSpurnedThreadActive");
-                        Action setPlayerAsExisting = new Action("setPlayerAsExisting");
+                        Action setSpurnedAsRobber = new Action("setSpurnedAsRobber");
+                        Action setNewAsPatron = new Action("setNewAsPatron");             // Was Existing
                         Action setPlayerAsPatron = new Action("setPlayerAsPatron");
-                        Action setExistingAsServer = new Action("setExistingAsServer");
+                        Action setNewAsServer = new Action("setNewAsServer");             // Was Existing
                         spurnedDater.children.Add(isSpurnedThreadActive);
                         spurnedDater.children.Add(setSpurnedAsRobber);
-                        spurnedDater.children.Add(setPlayerAsExisting);
+                        spurnedDater.children.Add(setNewAsPatron);                             // Was Existing
                         spurnedDater.children.Add(setPlayerAsPatron);
-                        spurnedDater.children.Add(setExistingAsServer);
+                        spurnedDater.children.Add(setNewAsServer);                             // Was Existing
                     }
                     Sequence doesntMatter = new Sequence("Doesnt Matter");
                     {
-                        Action setExistingAsRobber = new Action("setExistingAsRobber");
+                        Action setNewAsRobber = new Action("setNewAsRobber");             // Was Existing
                         Action setPlayerAsRobber = new Action("setPlayerAsRobber");
-                        Action setExistingAsServer = new Action("setExistingAsServer");
-                        Action setExistingAsPatron = new Action("setExistingAsPatron");
-                        doesntMatter.children.Add(setExistingAsRobber);
+                        Action setNewAsServer = new Action("setNewAsServer");             // Was Existing
+                        Action setNewAsPatron = new Action("setNewAsPatron");             // Was Existing
+                        doesntMatter.children.Add(setNewAsRobber);                             // Was Existing
                         doesntMatter.children.Add(setPlayerAsRobber);
-                        doesntMatter.children.Add(setExistingAsServer);
-                        doesntMatter.children.Add(setExistingAsPatron);
+                        doesntMatter.children.Add(setNewAsServer);                             // Was Existing
+                        doesntMatter.children.Add(setNewAsPatron);                             // Was Existing
 
                     }
-
+                    conclusionPlan.children.Add(widdowGoneMad);
+                    conclusionPlan.children.Add(starCrossedLovers);
+                    conclusionPlan.children.Add(spurnedDater);
+                    conclusionPlan.children.Add(doesntMatter);
                 }
                 toConclusionPlan.children.Add(isConclusionAct);
                 toConclusionPlan.children.Add(conclusionPlan);
@@ -256,12 +277,13 @@ public class SceneInitializer {
                             statCrossedSetup.children.Add(setLover1AsServer);
                             statCrossedSetup.children.Add(setLover2AsPatron);
                         }
-
+                        starCrossedLovers.children.Add(isLoversThreadActive);
+                        starCrossedLovers.children.Add(statCrossedSetup);
                     }
                     Sequence spurnedDater = new Sequence("The Spurned Dater");
                     {
                         Check isSpurnedThreadActive = new Check("isSpurnedThreadActive");
-                        Action setSpurnedAsRobber = new Action("isSpurnedThreadActive");
+                        Action setSpurnedAsRobber = new Action("setSpurnedAsRobber");
                         Action setNewAsPatron= new Action("setNewAsPatron");
                         Action setNewAsServer = new Action("setNewAsServer");
                         Action setPlayerAsServer = new Action("setPlayerAsServer");
@@ -295,18 +317,23 @@ public class SceneInitializer {
                         madWidow.children.Add(setNewAsServer);
                         madWidow.children.Add(setNewAsPatron);
                     }
-
+                    climaticPlan.children.Add(starCrossedLovers);
+                    climaticPlan.children.Add(spurnedDater);
+                    climaticPlan.children.Add(madWidowPlayer);
+                    climaticPlan.children.Add(madWidow);
                 }
-
+                toClimacticPlan.children.Add(isClimacticScene);
+                toClimacticPlan.children.Add(climaticPlan);
             }
             //Exposition Plan
-            Action createRandomRobberySetup = new Action("createRandomSetup");
+            Action createRandomRobberySetup = new Action("createRandomRobberySetup");
             root.children.Add(toConclusionPlan);
             root.children.Add(toClimacticPlan);
             root.children.Add(createRandomRobberySetup);
         }
         return root;
     }
+
 	public Selector setupFuneralTree(){
 		Selector root = new Selector ("Funeral Setup");
 		{
@@ -316,14 +343,20 @@ public class SceneInitializer {
 				Check isConclusionAct = new Check ("isThirdScene");
 				Selector conclusionPlan = new Selector ("Conclusion Plan");
 				{
-					Sequence robberandlover = new Sequence ("The Robber and the Lover");
+					Sequence robberAndLover = new Sequence ("The Robber and the Lover");
 					{
 						Check isRobberPlotThreadActive = new Check("isRobberPlotThreadActive");
 						Check isLoverPlotThreadActive = new Check("isLoverPlotThreadActive");
-						Action setPlayerAsLover = new Action("setPlayerAsLover");
+                        Action setLover1AsWidow = new Action("setLover1AsWidow");
+                        Action setPlayerAsWidow = new Action("setPlayerAsWidow");
 						Action setDateAsRobber = new Action("setDateAsRobber");
-					}
-					Sequence RobberatFune = new Sequence ("Robber at Funeral");
+                        robberAndLover.children.Add(isRobberPlotThreadActive);
+                        robberAndLover.children.Add(isLoverPlotThreadActive);
+                        robberAndLover.children.Add(setLover1AsWidow);
+                        robberAndLover.children.Add(setPlayerAsWidow);
+                        robberAndLover.children.Add(setDateAsRobber);
+                    }
+					Sequence robberAtFuneral = new Sequence ("Robber at Funeral");
 					{
 						Check isRobberPlotThreadActive = new Check("isRobberPlotThreadActive");
 						Selector whoIsTheRobber = new Selector("Who will play the Robber");
@@ -332,42 +365,42 @@ public class SceneInitializer {
 							{
 								Check wasRobberPlayer = new Check("wasRobberPlayer");
 								Action setMournerAsRobber = new Action("setMournerAsRobber");
-								Action setPlayerAsExisting = new Action("setPlayerAsExisting");
-								robberWasPlayer.children.Add(wasRobberPlayer);
+								Action setPlayerAsNew = new Action("setPlayerAsNew");     // Was Existing
+                                robberWasPlayer.children.Add(wasRobberPlayer);
 								robberWasPlayer.children.Add(setMournerAsRobber);
-								robberWasPlayer.children.Add(setPlayerAsExisting);
-							}
+								robberWasPlayer.children.Add(setPlayerAsNew);                  // Was Existing
+                            }
 							Sequence robberWasNotPlayer = new Sequence("The robber was not the player");
 							{
 								Action setPlayerAsRobber = new Action("setPlayerAsRobber");
-								Action setMournerAsExisting = new Action("setMournerAsExisting");
-								robberWasNotPlayer.children.Add(setPlayerAsRobber);
-								robberWasNotPlayer.children.Add(setMournerAsExisting);
-							}
+								Action setMournerAsNew = new Action("setMournerAsNew");   // Was Existing
+                                robberWasNotPlayer.children.Add(setPlayerAsRobber);
+								robberWasNotPlayer.children.Add(setMournerAsNew);              // Was Existing
+                            }
 							whoIsTheRobber.children.Add(robberWasPlayer);
 							whoIsTheRobber.children.Add(robberWasNotPlayer);
 						}
-						RobberatFune.children.Add(isRobberPlotThreadActive);
-						RobberatFune.children.Add(whoIsTheRobber);
+                        robberAtFuneral.children.Add(isRobberPlotThreadActive);
+                        robberAtFuneral.children.Add(whoIsTheRobber);
 					}
 					Sequence LoveratFune = new Sequence("The Lover Goes to Funeral");
 					{
 						Check wasLoverPlayer = new Check("wasLoverPlayer");
 						Action setFuneAsLover = new Action("setFuneAsLover");
-						Action setPlayerAsExisting = new Action("setPlayerAsExisting");
-						LoveratFune.children.Add(wasLoverPlayer);
+						Action setPlayerAsNew = new Action("setPlayerAsNew");             // Was Existing
+                        LoveratFune.children.Add(wasLoverPlayer);
 						LoveratFune.children.Add(setFuneAsLover);
-						LoveratFune.children.Add(setPlayerAsExisting);
-					}
+						LoveratFune.children.Add(setPlayerAsNew);                              // Was Existing
+                    }
 					Sequence playerLover = new Sequence("The Player is the Widow");
 					{
 						Action setPlayerAsLover = new Action("setPlayerAsLover");
-						Action setFuneAsExisting = new Action("setFuneAsExisting");
-						LoveratFune.children.Add(setPlayerAsLover);
-						LoveratFune.children.Add(setFuneAsExisting);
-					}
-					conclusionPlan.children.Add(robberandlover);
-					conclusionPlan.children.Add(RobberatFune);
+						Action setFuneAsNew = new Action("setFuneAsNew");                 // Was Existing
+                        LoveratFune.children.Add(setPlayerAsLover);
+						LoveratFune.children.Add(setFuneAsNew);                                // Was Existing
+                    }
+					conclusionPlan.children.Add(robberAndLover);
+					conclusionPlan.children.Add(robberAtFuneral);
 					conclusionPlan.children.Add(LoveratFune);
 					conclusionPlan.children.Add(playerLover);
 				}
@@ -426,10 +459,10 @@ public class SceneInitializer {
 				toClimacticPlan.children.Add(climaticPlan);
 			}
 			//Exposition Plan
-			Action createRandomSetup = new Action("createRandomSetup");
+			Action createRandomFuneralSetup = new Action("createRandomFuneralSetup");
 			root.children.Add(toConclusionPlan);
 			root.children.Add(toClimacticPlan);
-			root.children.Add(createRandomSetup);
+			root.children.Add(createRandomFuneralSetup);
 		}
 		return root;
 	}
