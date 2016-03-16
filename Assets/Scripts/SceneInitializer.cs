@@ -307,4 +307,130 @@ public class SceneInitializer {
         }
         return root;
     }
+	public Selector setupFuneralTree(){
+		Selector root = new Selector ("Funeral Setup");
+		{
+			//Conclusion plan
+			Sequence toConclusionPlan = new Sequence("To Conclusion Plan");
+			{
+				Check isConclusionAct = new Check ("isThirdScene");
+				Selector conclusionPlan = new Selector ("Conclusion Plan");
+				{
+					Sequence robberandlover = new Sequence ("The Robber and the Lover");
+					{
+						Check isRobberPlotThreadActive = new Check("isRobberPlotThreadActive");
+						Check isLoverPlotThreadActive = new Check("isLoverPlotThreadActive");
+						Action setPlayerAsLover = new Action("setPlayerAsLover");
+						Action setDateAsRobber = new Action("setDateAsRobber");
+					}
+					Sequence RobberatFune = new Sequence ("Robber at Funeral");
+					{
+						Check isRobberPlotThreadActive = new Check("isRobberPlotThreadActive");
+						Selector whoIsTheRobber = new Selector("Who will play the Robber");
+						{
+							Sequence robberWasPlayer = new Sequence("The robber was the player");
+							{
+								Check wasRobberPlayer = new Check("wasRobberPlayer");
+								Action setMournerAsRobber = new Action("setMournerAsRobber");
+								Action setPlayerAsExisting = new Action("setPlayerAsExisting");
+								robberWasPlayer.children.Add(wasRobberPlayer);
+								robberWasPlayer.children.Add(setMournerAsRobber);
+								robberWasPlayer.children.Add(setPlayerAsExisting);
+							}
+							Sequence robberWasNotPlayer = new Sequence("The robber was not the player");
+							{
+								Action setPlayerAsRobber = new Action("setPlayerAsRobber");
+								Action setMournerAsExisting = new Action("setMournerAsExisting");
+								robberWasNotPlayer.children.Add(setPlayerAsRobber);
+								robberWasNotPlayer.children.Add(setMournerAsExisting);
+							}
+							whoIsTheRobber.children.Add(robberWasPlayer);
+							whoIsTheRobber.children.Add(robberWasNotPlayer);
+						}
+						RobberatFune.children.Add(isRobberPlotThreadActive);
+						RobberatFune.children.Add(whoIsTheRobber);
+					}
+					Sequence LoveratFune = new Sequence("The Lover Goes to Funeral");
+					{
+						Check wasLoverPlayer = new Check("wasLoverPlayer");
+						Action setFuneAsLover = new Action("setFuneAsLover");
+						Action setPlayerAsExisting = new Action("setPlayerAsExisting");
+						LoveratFune.children.Add(wasLoverPlayer);
+						LoveratFune.children.Add(setFuneAsLover);
+						LoveratFune.children.Add(setPlayerAsExisting);
+					}
+					Sequence playerLover = new Sequence("The Player is the Widow");
+					{
+						Action setPlayerAsLover = new Action("setPlayerAsLover");
+						Action setFuneAsExisting = new Action("setFuneAsExisting");
+						LoveratFune.children.Add(setPlayerAsLover);
+						LoveratFune.children.Add(setFuneAsExisting);
+					}
+					conclusionPlan.children.Add(robberandlover);
+					conclusionPlan.children.Add(RobberatFune);
+					conclusionPlan.children.Add(LoveratFune);
+					conclusionPlan.children.Add(playerLover);
+				}
+				toConclusionPlan.children.Add(isConclusionAct);
+				toConclusionPlan.children.Add(conclusionPlan);
+			}
+			//Climactic plan
+			Sequence toClimacticPlan = new Sequence("To Climactic Plan");
+			{
+				Check isClimacticScene = new Check ("isSecondScene");
+				Selector climaticPlan = new Selector ("ClimacticPlan");
+				{
+					Sequence RobberatFune = new Sequence ("Robber at Funeral");
+					{
+						Check isRobberPlotThreadActive = new Check("isRobberPlotThreadActive");
+						Selector whoIsTheRobber = new Selector("Who will play the Robber");
+						{
+							Sequence robberWasPlayer = new Sequence("The robber was the player");
+							{
+								Check wasRobberPlayer = new Check("wasRobberPlayer");
+								Action robberFune = new Action("makeRobberMourn");
+								robberWasPlayer.children.Add(wasRobberPlayer);
+								robberWasPlayer.children.Add(robberFune);
+							}
+
+							Action robberPlayer = new Action("makerRobberPlayer");
+							whoIsTheRobber.children.Add(robberWasPlayer);
+							whoIsTheRobber.children.Add(robberPlayer);
+						}
+						RobberatFune.children.Add(isRobberPlotThreadActive);
+						RobberatFune.children.Add(whoIsTheRobber);
+					}
+					Sequence loversthere = new Sequence("Lover is there");
+					{
+						Check isLoverPlotThreadActive = new Check("isLoverPlotThreadActive");
+						Selector whoIsTheLover = new Selector("Who will play the Lover");
+						{
+							Sequence loverWasPlayer = new Sequence("The lover was the player");
+							{
+								Check wasloverPlayer = new Check("wasloverPlayer");
+								Action loverFune = new Action("makeLoverMourn");
+								loverWasPlayer.children.Add(wasloverPlayer);
+								loverWasPlayer.children.Add(loverFune);
+							}
+							Action loverPlayer = new Action("makerloverPlayer");
+							whoIsTheLover.children.Add(loverWasPlayer);
+							whoIsTheLover.children.Add(loverPlayer);
+						}
+						loversthere.children.Add(isLoverPlotThreadActive);
+						loversthere.children.Add(whoIsTheLover);
+					}
+					climaticPlan.children.Add(RobberatFune);
+					climaticPlan.children.Add(loversthere);
+				}
+				toClimacticPlan.children.Add(isClimacticScene);
+				toClimacticPlan.children.Add(climaticPlan);
+			}
+			//Exposition Plan
+			Action createRandomSetup = new Action("createRandomSetup");
+			root.children.Add(toConclusionPlan);
+			root.children.Add(toClimacticPlan);
+			root.children.Add(createRandomSetup);
+		}
+		return root;
+	}
 }
