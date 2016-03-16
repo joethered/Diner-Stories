@@ -7,7 +7,7 @@ using System;
 
 public abstract class Node
 {
-    public virtual bool excecute(State state)
+    public virtual bool execute(State state)
     {
         throw new NotImplementedException();
     }
@@ -17,7 +17,7 @@ public abstract class Node
 public abstract class Composite : Node
 {
     string name;
-    protected List<Node> children = new List<Node>();
+    public List<Node> children = new List<Node>();
 
     public Composite(List<Node> childNodes, String name = null)
     {
@@ -42,11 +42,11 @@ public class Selector : Composite
     public Selector(List<Node> childNodes, String name) : base(childNodes, name) { }
     public Selector(String name) : base(name) { }
 
-    public bool execute(State state)
+    public override bool execute(State state)
     {
         foreach (Node child in children)
         {
-            bool success = child.excecute(state);
+            bool success = child.execute(state);
             if (success)
             {
                 return true;
@@ -63,11 +63,11 @@ public class Sequence : Composite
     public Sequence (List<Node> childNodes, String name) : base(childNodes, name) { }
     public Sequence(String name) : base(name) { }
 
-    public bool execute(State state)
+    public override bool execute(State state)
     {
         foreach (Node child in children)
         {
-            bool continue_execution = child.excecute(state);
+            bool continue_execution = child.execute(state);
             if (!continue_execution)
             {
                 return false;
@@ -91,7 +91,7 @@ public class Check : Node
         this.check_function = checkType.GetMethod(check_function);
     }
 
-    public bool execute(State state)
+    public override bool execute(State state)
     {
         object[] parameters = new object[1];
         parameters[0] = state;
@@ -112,7 +112,7 @@ public class Action : Node
         this.action_function = actionType.GetMethod(action_function);
     }
 
-    public bool execute(State state)
+    public override bool execute(State state)
     {
         object[] parameters = new object[1];
         parameters[0] = state;
