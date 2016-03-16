@@ -55,7 +55,7 @@ public class ActManager : MonoBehaviour {
 			button1.interactable = false;
 			PlayerPrefs.SetInt ("spdate", 1);
 			x = 1;
-			SceneManager.LoadScene ("Scene UI");
+			SceneManager.LoadScene ("SceneRunner");
 			break;
 
 		case "Robbery":
@@ -63,7 +63,7 @@ public class ActManager : MonoBehaviour {
 			button2.interactable = false;
 			PlayerPrefs.SetInt ("rob", 1);
 			y = 1;
-			SceneManager.LoadScene ("Scene UI");
+			SceneManager.LoadScene ("SceneRunner");
 			break;
 
 		case "Funeral":
@@ -71,7 +71,7 @@ public class ActManager : MonoBehaviour {
 			button3.interactable = false;
 			PlayerPrefs.SetInt ("fun", 1);
 			z = 1;
-			SceneManager.LoadScene ("Scene UI");
+			SceneManager.LoadScene ("SceneRunner");
 			break;
 
 		}
