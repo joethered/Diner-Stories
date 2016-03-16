@@ -21,6 +21,7 @@ public class SceneInitializer {
                     {
                         Check isRobberPlotThreadActive = new Check("isRobberPlotThreadActive");
                         Check isWidowedPlotThreadActive = new Check("isWidowedPlotThreadActive");
+                        //Action setEx
                         Action setPlayerAsWidow = new Action("setPlayerAsWidow");
                         Action setDateAsRobber = new Action("setDateAsRobber");
                         robberAndWidow.children.Add(isRobberPlotThreadActive);
